@@ -1,8 +1,7 @@
 import { login } from "@/api/api";
 import { ErrorResponse, LoginProps, SuccessResponse } from "@/api/schemas";
-import { getToken } from "@/utils/tokenStorage";
-import { jwtDecode } from "jwt-decode";
 import { create } from "zustand";
+// import { deleteToken, getToken } from "../utils/tokenStorage";
 
 export interface AuthStore {
     user: any;
@@ -22,6 +21,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     signIn: async ({ email, password }: LoginProps) => {
         try {
             set({ loading: true });
+            console.log("sign in")
             const response: SuccessResponse | ErrorResponse = await login({ email, password })
 
             if (response.isError) {
@@ -47,28 +47,27 @@ export const useAuthStore = create<AuthStore>((set) => ({
     },
 
     checkAuth: async () => {
-        const token = await getToken();
+        // const token = await getToken();
 
-        if (!token) {
-            set({ loading: false });
-            return;
-        }
+        // if (!token) {
+        //     set({ loading: false });
+        //     return;
+        // }
 
-        const decoded: any = jwtDecode(token);
+        // const decoded: any = jwtDecode(token);
 
-        const expired = decoded?.exp * 1000 < Date.now();
+        // const expired = decoded?.exp * 1000 < Date.now();
 
-        if (expired) {
-            // await deleteToken();
-            set({ token: null, user: null, loading: false });
-            return;
-        }
+        // if (expired) {
+        //     // await deleteToken();
+        //     set({ token: null, user: null, loading: false });
+        //     return;
+        // }
 
-        set({
-            token,
-            user: decoded,
-            loading: false,
-        });
+        // set({
+        //     token,
+        //     user: decoded,
+        //     loading: false,
+        // });
     },
 }));
-

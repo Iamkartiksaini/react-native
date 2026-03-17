@@ -1,17 +1,20 @@
-import { Link, Stack } from "expo-router";
-import { Text, View } from "react-native";
+import { router, Stack } from 'expo-router';
+import React from 'react';
+import { Text, TouchableHighlight, View } from 'react-native';
 
 export default function HomePage() {
+
+    function redirectToAuth() {
+        router.push("/auth")
+    }
+
     return (
-        <View>
-            <Stack.Screen options={{ title: "Home Page" }} />
-            <Text>Home Page</Text>
-            <Link href={"/dashboard" as any}>Go to Dashboard</Link>
-            <View className="flex-1 items-center justify-center bg-white">
-                <Text className="text-xl font-bold text-blue-500">
-                    Welcome to Nativewind!
-                </Text>
-            </View>
+        <View className='p-3'>
+            <Stack.Screen options={{ title: "Home" }} />
+            <Text>HomePage</Text>
+            <TouchableHighlight className='py-1 text-center w-max px-3 bg-blue-500 rounded ' onPress={redirectToAuth}>
+                <Text className='text-white'>Go to Auth Page</Text>
+            </TouchableHighlight>
         </View>
-    );
+    )
 }

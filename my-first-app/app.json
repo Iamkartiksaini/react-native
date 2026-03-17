@@ -36,11 +36,16 @@
           }
         }
       ],
-      "expo-secure-store"
+       [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+            "faceIDPermission": "Allow $(my-first-app) to access your Face ID biometric data."
+        }
+      ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     }
   }
 }

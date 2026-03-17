@@ -8,6 +8,7 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+Ai-INCOG.txt
 
 app2
 app2/*

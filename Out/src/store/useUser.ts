@@ -1,4 +1,5 @@
-import { ErrorResponse, login, LoginProps, SuccessResponse } from '@/api';
+import { login } from '@/api/api';
+import { ErrorResponse, LoginProps, SuccessResponse } from '@/api/schemas';
 import { create } from 'zustand';
 
 const useStore = create((set) => ({
