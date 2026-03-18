@@ -5,10 +5,12 @@ export interface LoginProps {
 
 export interface SuccessResponse {
     user: {
-        fullName: string,
+        fullName?: string,
+        name?: string,
         email: string,
     },
     token: string,
+    refreshToken?: string,
     isError: string | null
 }
 

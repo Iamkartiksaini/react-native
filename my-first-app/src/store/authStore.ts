@@ -1,7 +1,9 @@
 import { login } from "@/api/api";
 import { ErrorResponse, LoginProps, SuccessResponse } from "@/api/schemas";
-import { getToken } from "@/utils/tokenStorage";
+import { deleteToken, getToken } from "@/utils/tokenStorage";
+import { router } from "expo-router";
 import { jwtDecode } from "jwt-decode";
+import { ToastAndroid } from "react-native";
 import { create } from "zustand";
 
 export interface AuthStore {
@@ -23,27 +25,31 @@ export const useAuthStore = create<AuthStore>((set) => ({
         try {
             set({ loading: true });
             const response: SuccessResponse | ErrorResponse = await login({ email, password })
-
             if (response.isError) {
                 throw new Error(response.isError)
             }
             if (response?.user) {
-                set({ user: response.user, token: response.token, loading: false });
+                const user = response.user
+                set({ user, token: response.token, loading: false });
+                ToastAndroid.showWithGravity("Welcome " + user?.name, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
             }
         } catch (error: any) {
             set({ user: null });
+            ToastAndroid.show(error?.message, ToastAndroid.SHORT)
         } finally {
             set({ loading: false });
         }
     },
 
     logout: async () => {
-        // await deleteToken();
-
+        router.replace("/")
+        await deleteToken();
         set({
             user: null,
             token: null,
+            loading: false
         });
+        ToastAndroid.showWithGravity("Logged out successfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
     },
 
     checkAuth: async () => {

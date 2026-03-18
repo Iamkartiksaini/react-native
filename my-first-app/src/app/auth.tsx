@@ -1,7 +1,7 @@
+import { useAuthStore } from '@/store/authStore';
 import { router, Stack } from 'expo-router';
-import { jwtDecode } from 'jwt-decode';
 import { MoveLeft } from 'lucide-react-native';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function AuthScreen() {
@@ -9,17 +9,28 @@ export default function AuthScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const { signIn, loading, user, token } = useAuthStore()
 
-    function handleSubmit() {
-        if (isLogin) {
-            const payload = { email, password }
+    useEffect(() => {
+        if (!loading && user && token) {
+            router.replace('/dashboard')
         }
+    }, [user, token, loading])
+
+    async function handleSubmit() {
         try {
-            const data = jwtDecode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30")
-            console.log(data)
+            if (isLogin) {
+                const payload = { email, password }
+                const res = await signIn(payload)
+            }
         } catch (error: any) {
             console.log(error?.message)
         }
+    }
+
+    function demoCred() {
+        setEmail("kartik@gmail.com")
+        setPassword("kartik1")
     }
 
     return (
@@ -41,7 +52,7 @@ export default function AuthScreen() {
                 className="flex-1 bg-grey-50 justify-center font-sans"
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    <View className="bg-white px-4 pt-8 rounded-3xl shadow-sm border border-gray-100 h-full">
+                    <View className="bg-white px-4 pt-8 border border-gray-100 h-full">
 
                         {/* Header */}
                         <View className="items-center mb-8 gap-2">
@@ -113,11 +124,16 @@ export default function AuthScreen() {
                                 <Text className="px-4 text-sm text-gray-500 font-medium tracking-wider">OR</Text>
                                 <View className="flex-1 h-[1px] bg-gray-200" />
                             </View>
-
                             {/* Social Buttons */}
-                            <TouchableOpacity className="flex-row items-center justify-center border border-gray-200 rounded-xl py-3.5 bg-white active:bg-gray-50">
-                                <Text className="text-gray-700 text-base font-medium">Continue with Google</Text>
-                            </TouchableOpacity>
+                            <View className="flex-row items-center my-6 gap-2 justify-center">
+                                <TouchableOpacity onPress={demoCred} className="flex-row w-min px-3 items-center justify-center border border-orange-400 rounded-lg py-2 bg-white active:bg-gray-50">
+                                    <Text className="text-gray-700 text-base font-medium">Use Demo Cred</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    className="flex-row w-min px-3 items-center justify-center border border-gray-200 rounded-lg py-2 bg-white active:bg-gray-50">
+                                    <Text className="text-gray-700 text-base font-medium">Continue with Google</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
 
                         {/* Footer Toggle */}
