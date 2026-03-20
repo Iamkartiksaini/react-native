@@ -9,6 +9,7 @@ dist/
 web-build/
 expo-env.d.ts
 Ai-INCOG.txt
+.idea
 
 app2
 app2/*

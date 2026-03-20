@@ -36,11 +36,28 @@
           }
         }
       ],
-       [
+      [
         "expo-secure-store",
         {
           "configureAndroidBackup": true,
-            "faceIDPermission": "Allow $(my-first-app) to access your Face ID biometric data."
+          "faceIDPermission": "Allow $(my-first-app) to access your Face ID biometric data."
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/poppins/Poppins-Bold.ttf",
+            "./assets/fonts/poppins/Poppins-ExtraBold.ttf",
+            "./assets/fonts/poppins/Poppins-ExtraLight.ttf",
+            "./assets/fonts/poppins/Poppins-Italic.ttf",
+            "./assets/fonts/poppins/Poppins-Light.ttf",
+            "./assets/fonts/poppins/Poppins-Medium.ttf",
+            "./assets/fonts/poppins/Poppins-Regular.ttf",
+            "./assets/fonts/poppins/Poppins-SemiBold.ttf",
+            "./assets/fonts/poppins/Poppins-Thin.ttf",
+            "./assets/fonts/bebas/BebasNeue-Regular.ttf"
+          ]
         }
       ]
     ],

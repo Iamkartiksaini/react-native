@@ -5,7 +5,16 @@ module.exports = {
   presets: [require("nativewind/preset")],
   darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'poppins-bold': ['Poppins-Bold'],
+        'poppins-semibold': ['Poppins-SemiBold'],
+        'poppins-medium': ['Poppins-Medium'],
+        'poppins-regular': ['Poppins-Regular'],
+        'poppins-light': ['Poppins-Light'],
+        'bebas': ['BebasNeue-Regular'],
+      },
+    },
   },
   plugins: [],
 }
