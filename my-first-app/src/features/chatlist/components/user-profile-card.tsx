@@ -1,8 +1,8 @@
-import { CheckCheck } from 'lucide-react-native';
+import PoppinsText from '@/components/ui/poppins-text';
+import { Check, CheckCheck } from 'lucide-react-native';
 import React, { useMemo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
-import PoppinsText from './ui/poppins-text';
 
 const UserProfileCard = ({ ...props }: any) => {
     const { id, title, message, profilePic, time, message_status, avatarSize = 48 } = props
@@ -26,7 +26,7 @@ const UserProfileCard = ({ ...props }: any) => {
         <View style={st.profilePic}>
             <PoppinsText size={18} weight="semibold" className='text-white'>{title.slice(0, 1).toUpperCase()}</PoppinsText>
         </View>
-
+    const isSeen = message_status === "seen" ? <CheckCheck color="green" size={14} /> : <Check color="gray" size={14} />
     return (
         <View className='flex-row items-center gap-2 border-y border-neutral-100 p-2 active:bg-green hover:bg-green'>
             {Avatar}
@@ -38,7 +38,7 @@ const UserProfileCard = ({ ...props }: any) => {
                     <PoppinsText size={14} weight='light' className='text-[16px] text-neutral-500'>{message}</PoppinsText>
                 </View>
                 <View className='absolute right-0 top-0 flex-row gap-1 items-center'>
-                    <CheckCheck color="green" size={14} />
+                    {isSeen}
                     <PoppinsText size={10} weight='light' className='text-[16px] text-neutral-500'>{time}</PoppinsText>
                 </View>
             </View>

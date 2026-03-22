@@ -18,6 +18,7 @@ const PoppinsText = ({ children, size = 16, style = {}, className, weight, ...pr
         text: {
             ...style,
             fontSize: scale(size),
+            lineHeight: scale(size + 4),
         }
     }), [size])
 
