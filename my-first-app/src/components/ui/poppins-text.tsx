@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TextProps } from 'react-native';
+import { Animated, StyleSheet, Text, TextProps } from 'react-native';
 import { scale } from 'react-native-size-matters';
 
 type PoppinsWeight = 'bold' | 'semibold' | 'medium' | 'regular' | 'light';
@@ -47,5 +47,25 @@ const PoppinsText = ({ children, size = 16, style = {}, className, weight, ...pr
     )
 }
 
+export const DynamicText = ({ children, size = 16, style = {}, className, ...props }: TextProps & PoppinsTextProps) => {
+
+    const st = useMemo(() => StyleSheet.create({
+        text: {
+            ...style,
+            fontSize: scale(size),
+            lineHeight: scale(size + 4),
+        }
+    }), [size])
+
+    return (
+        <Text {...props}
+            className={className || ''}
+            style={[st.text]}
+        >
+            {children}
+        </Text>
+    )
+}
+export const AnimatedText = Animated.createAnimatedComponent(PoppinsText)
 
 export default PoppinsText

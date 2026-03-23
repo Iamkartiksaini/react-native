@@ -1,11 +1,14 @@
 import ExpandableModel from '@/features/expandable-model'
-import React from 'react'
-import { View } from 'react-native'
+import React, { Fragment } from 'react'
+import { StatusBar, View } from 'react-native'
 
 export default function ExpandableModelPage() {
     return (
-        <View className='flex-1 '>
-            <ExpandableModel />
-        </View>
+        <Fragment>
+            <StatusBar hidden={true} backgroundColor={"#000"} />
+            <View className='flex-1 '>
+                <ExpandableModel />
+            </View>
+        </Fragment>
     )
 }

@@ -1,114 +1,131 @@
-import PoppinsText from '@/components/ui/poppins-text';
+import PoppinsText, { DynamicText } from '@/components/ui/poppins-text';
 import { CircleQuestionMark, X } from 'lucide-react-native';
-import React, { useRef, useState } from 'react';
-import { Animated, Easing, TouchableWithoutFeedback, View } from 'react-native';
-
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { Animated, Easing, TouchableWithoutFeedback, Vibration, View } from 'react-native';
 
 export default function ExpandableModel() {
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const [transitionElementsCords, setTransitionElementsCords] = useState({
-        "org": { x: 0, y: 0, width: 0, height: 0 },
-        "target": { x: 0, y: 0, width: 0, height: 0 }
+    const itemRef = useRef<any>(null)
+    const targetRef = useRef<any>(null)
+
+    // ITEM ANIMATION
+    const itemHeight = useRef(new Animated.Value(0)).current
+    const itemWidth = useRef(new Animated.Value(0)).current
+    const itemPageX = useRef(new Animated.Value(-50)).current
+    const itemPageY = useRef(new Animated.Value(0)).current
+
+    // MODAL ANIMATION
+    const modalTranslateY = useRef(new Animated.Value(0)).current
+    const modalOpacity = useRef(new Animated.Value(0)).current
+
+    const [elements, setTransitionElements] = useState({
+        "item": { x: 0, y: 0, width: 0, height: 0, pageX: 0, pageY: 0 },
+        "target": { x: 0, y: 0, width: 0, height: 0, pageX: 0, pageY: 0 }
     })
 
-    const modal_btn_width = useRef(new Animated.Value(120)).current
-    const modal_btn_left = useRef(new Animated.Value(120)).current
 
-    const modalTranslateY = useRef(new Animated.Value(100)).current
-    const ModalOpacityAnimation = useRef(new Animated.Value(0)).current
+    useLayoutEffect(() => {
+        loadItemDimensions()
+        loadTargetDimensions()
+    }, [])
 
-    function toggleScale() {
-        setIsModalOpen(pre => !pre)
-        if (!isModalOpen) {
-            Animated.parallel([
-                Animated.timing(modalTranslateY, {
-                    toValue: 0,
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(ModalOpacityAnimation, {
-                    toValue: 1,
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(modal_btn_width, {
-                    toValue: transitionElementsCords.org.width,
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: false,
-                }),
-                Animated.timing(modal_btn_left, {
-                    toValue: transitionElementsCords.org.x,
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: false,
-                }),
-            ])
-                .start();
-        } else {
 
-            Animated.parallel([
-                Animated.timing(modalTranslateY, {
-                    toValue: 100,
-                    duration: 200,
-                    easing: Easing.in(Easing.ease),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(ModalOpacityAnimation, {
-                    toValue: 0,
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(modal_btn_width, {
-                    toValue: 120,
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: false,
-                }),
-            ])
-                .start(() => setIsModalOpen(false));
+    function loadItemDimensions() {
+        if (itemRef.current?.measure) {
+            itemRef.current?.measure((...props: number[]) => {
+                const [x, y, width, height, pageX, pageY] = props;
+                itemWidth.setValue(width)
+                itemHeight.setValue(height)
+                itemPageX.setValue(0)
+                itemPageY.setValue(0)
+                modalTranslateY.setValue(400)
 
+                setTransitionElements(prev => {
+                    let obj = { ...prev }
+                    obj.item = {
+                        x, y, width, height, pageX, pageY
+                    }
+                    return obj
+                })
+            });
+        }
+    }
+
+    function loadTargetDimensions() {
+        if (targetRef.current?.measure) {
+            targetRef.current?.measure((...props: number[]) => {
+                const [x, y, width, height, pageX, pageY] = props;
+                setTransitionElements(prev => {
+                    let obj = { ...prev }
+                    obj.target = {
+                        x, y, width, height, pageX, pageY
+                    }
+                    return obj
+                })
+            });
         }
     }
 
 
-    function modelSubmitButtonDimensions(e: any) {
-        const layout = e.nativeEvent.layout;
-        setTransitionElementsCords(prev => {
-            let obj = { ...prev }
-            obj.org = layout
-            return obj
-        })
+    function toggleModalAnimation() {
+
+        setIsModalOpen(pre => !pre)
+        Vibration.vibrate(30)
+        if (!isModalOpen) {
+            const cords = {
+                x: elements.target.pageX - elements.item.pageX,
+                y: elements.target.pageY - elements.item.pageY,
+            }
+            Animated.parallel([
+                animateItem(modalTranslateY, 0, { easing: Easing.elastic(1.1), duration: 400 }),
+                animateItem(modalOpacity, 1, { duration: 700 }),
+                animateItem(itemWidth, elements.target.width, { easing: Easing.elastic(1.8), duration: 500 }),
+                Animated.sequence([
+                    animateItem(itemHeight, elements.target.height + 10, { easing: Easing.elastic(1.8), }),
+                    animateItem(itemHeight, elements.target.height, { easing: Easing.elastic(1.8), }),
+                ]),
+                animateItem(itemPageX, cords.x - elements.item.x, { delay: 0 }),
+                animateItem(itemPageY, cords.y, { delay: 0 }),
+            ]).start();
+
+        } else {
+            Animated.parallel([
+                animateItem(modalTranslateY, 400),
+                animateItem(modalOpacity, 1),
+                animateItem(itemWidth, elements.item.width, { easing: Easing.elastic(1.8), duration: 500 }),
+                Animated.sequence([
+                    animateItem(itemHeight, elements.item.height + 5, { easing: Easing.elastic(1.8), }),
+                    animateItem(itemHeight, elements.item.height, { easing: Easing.elastic(1.8), }),
+                ]),
+                animateItem(itemPageX, 0),
+                animateItem(itemPageY, 0),
+            ]).start();
+        }
     }
 
-    function targetSubmitButtonDimensions(e: any) {
-        const layout = e.nativeEvent.layout;
-        setTransitionElementsCords(prev => {
-            let obj = { ...prev }
-            obj.target = layout
-            return obj
+    function animateItem(reference: any, value: any, config?: any) {
+        return Animated.timing(reference, {
+            toValue: value,
+            duration: 300,
+            useNativeDriver: false,
+            ...config
         })
-
     }
-
-    console.log(transitionElementsCords);
 
     return (
-        <View className='bg-slate-900  flex-1'>
-            <View className='py-4 px-2 '>
-                <PoppinsText className='text-white' size={24}>Expandable Model</PoppinsText>
+        <View className='bg-[#142525]  flex-1'>
+            <View className='py-4 px-2 bg-[#0e1616] '>
+                <DynamicText className='text-white' size={24}>Expandable Model</DynamicText>
             </View>
             {/* Confirm Model Wrapper*/}
-            <Animated.View style={{
-                transform: [{
-                    translateY: modalTranslateY
-                }],
-                opacity: ModalOpacityAnimation
-            }} className='absolute bottom-0 left-0'>
+            <Animated.View
+                style={[
+                    { opacity: modalOpacity, zIndex: 3, width: "100%" },
+                    { transform: [{ translateY: modalTranslateY }] }
+                ]}
+                className='absolute bottom-4 left-0'>
                 {/* Confirm Model */}
                 <View className='mx-4 gap-8 p-4 bg-[#0e1616] rounded-3xl'>
                     {/* Top Portion */}
@@ -117,52 +134,67 @@ export default function ExpandableModel() {
                         <View className='flex-row items-center justify-between'>
                             {/* Confirm Model Header Left*/}
                             <View className='flex-row gap-2 items-center'>
-                                <CircleQuestionMark size={24} color={'#8df0cc'} style={{ transform: [{ translateY: -1 }] }} />
+                                <CircleQuestionMark size={22} color={'#8df0cc'} style={{ transform: [{ translateY: 0 }] }} />
                                 <PoppinsText weight='semibold' size={20} className='text-white '>Confirm</PoppinsText>
                             </View>
                             <View>
-                                <X onPress={toggleScale} size={24} color={"white"} />
+                                <X onPress={toggleModalAnimation} size={24} color={"white"} />
                             </View>
                         </View>
                         {/* Confirm Model Body */}
                         <View className='mt-4'>
-                            <PoppinsText size={12} className='text-slate-400 max-sm:text-sm'>
-                                Are you sure you want to receive a load of money?</PoppinsText>
+                            <DynamicText size={16} className='text-slate-400 max-sm:text-sm font-bebas'>Are you sure you want to receive a load of money?</DynamicText>
                         </View>
                     </View>
                     {/* Footer */}
                     <View className='flex-row gap-2'>
-                        <TouchableWithoutFeedback onPress={toggleScale} >
+                        <TouchableWithoutFeedback onPress={toggleModalAnimation} >
                             <View className=' bg-[#1a1e26] flex-1 py-1 px-4 text-white rounded-[50px] p-4 w-fit mx-auto flex-row items-center justify-center'>
                                 <PoppinsText size={14} weight='regular' className='text-white'>Cancel</PoppinsText>
                             </View>
                         </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback onLayout={modelSubmitButtonDimensions} style={{ opacity: 0 }}>
-                            <View style={{ opacity: 0 }} className='bg-[#8df0cc] flex-1 p-4 w-fit mx-auto rounded-full px-8 py-2 flex-row items-center justify-center'>
+                        <TouchableWithoutFeedback>
+                            <View ref={targetRef} style={{ opacity: 0 }} className='bg-[#8df0cc] flex-1 p-4 w-fit mx-auto rounded-full px-8 py-2 flex-row items-center justify-center'>
                                 <PoppinsText size={14} weight='regular'>Submit</PoppinsText>
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
                 </View>
             </Animated.View>
-            <View
-                style={{
-                    position: 'absolute',
-                    bottom: '0%',
-                    left: '50%',
-                    transform: [{ translateX: -50 }, { translateY: 0 }],
-                }}
-                className='p-4'>
+
+            <View style={{ zIndex: 3, position: "absolute", bottom: 16, left: 0 }}>
                 <TouchableWithoutFeedback
-                    onPress={toggleScale}>
+                    onPress={toggleModalAnimation}>
                     <Animated.View
-                        onLayout={targetSubmitButtonDimensions}
-                        style={[{ width: modal_btn_width, bottom: 0 }, { transform: [{ translateX: modal_btn_left }] }]}
-                        className='bg-[#8df0cc] p-4 absolute mx-auto rounded-full px-8 py-2 flex-row items-center justify-center'>
+                        ref={itemRef}
+                        style={[
+                            {
+                                position: "absolute",
+                                bottom: 0,
+                                left: 50,
+                                width: 300,
+                                alignItems: "center",
+                                transform: [
+                                    { translateX: -50 },
+                                    { translateY: 0 },
+                                ],
+                            }
+                            , elements.item.width > 0 ? {
+                                width: itemWidth,
+                                height: itemHeight,
+                                transform: [
+                                    { translateX: itemPageX },
+                                    { translateY: itemPageY },
+                                ],
+                            } : undefined]}
+                        className='bg-[#8df0cc] p-4  rounded-full px-8 py-2 flex-row items-center justify-center'>
                         <PoppinsText size={14} weight='regular'>Submit</PoppinsText>
                     </Animated.View>
                 </TouchableWithoutFeedback>
             </View>
+            {/* <View>
+                <PoppinsText className='text-white'>{JSON.stringify(elements, null, 2)}</PoppinsText>
+            </View> */}
         </View>
     )
 }
