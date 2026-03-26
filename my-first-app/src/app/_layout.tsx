@@ -33,12 +33,13 @@ export default function RootLayout() {
 
   return (
     <Fragment>
-      <StatusBar barStyle={"dark-content"} backgroundColor={"gray"} />
-      <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
+      <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: "transparent" }}>
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: "#ffffff36" }
+            contentStyle: { backgroundColor: "#ffffff36", }
           }}
         >
           <Stack.Screen name="index" />

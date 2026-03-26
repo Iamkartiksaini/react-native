@@ -1,10 +1,10 @@
 import PoppinsText, { DynamicText } from '@/components/ui/poppins-text';
 import { CircleQuestionMark, X } from 'lucide-react-native';
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Animated, Easing, TouchableWithoutFeedback, Vibration, View } from 'react-native';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Animated, Easing, StyleSheet, TouchableWithoutFeedback, Vibration, View } from 'react-native';
 
 export default function ExpandableModel() {
-
+    const MODAL_TRANFORMY_VALUE = 30
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const itemRef = useRef<any>(null)
@@ -27,39 +27,34 @@ export default function ExpandableModel() {
 
 
     useLayoutEffect(() => {
-        loadItemDimensions()
-        loadTargetDimensions()
+        loadAllDimensions()
+        return () => {
+            loadAllDimensions()
+        }
     }, [])
 
-
-    function loadItemDimensions() {
-        if (itemRef.current?.measure) {
-            itemRef.current?.measure((...props: number[]) => {
-                const [x, y, width, height, pageX, pageY] = props;
-                itemWidth.setValue(width)
-                itemHeight.setValue(height)
-                itemPageX.setValue(0)
-                itemPageY.setValue(0)
-                modalTranslateY.setValue(400)
-
-                setTransitionElements(prev => {
-                    let obj = { ...prev }
-                    obj.item = {
-                        x, y, width, height, pageX, pageY
-                    }
-                    return obj
-                })
-            });
-        }
+    function loadAllDimensions() {
+        loadDimensions("item")
+        loadDimensions("target")
     }
 
-    function loadTargetDimensions() {
-        if (targetRef.current?.measure) {
-            targetRef.current?.measure((...props: number[]) => {
+
+    function loadDimensions(key: "item" | "target") {
+        const contentRef = key === "item" ? itemRef : targetRef
+        if (contentRef.current?.measure) {
+            contentRef.current?.measure((...props: number[]) => {
                 const [x, y, width, height, pageX, pageY] = props;
+                if (key === "item") {
+                    itemWidth.setValue(width)
+                    itemHeight.setValue(height)
+                    itemPageX.setValue(0)
+                    itemPageY.setValue(0)
+                    modalTranslateY.setValue(MODAL_TRANFORMY_VALUE)
+                }
+
                 setTransitionElements(prev => {
                     let obj = { ...prev }
-                    obj.target = {
+                    obj[key] = {
                         x, y, width, height, pageX, pageY
                     }
                     return obj
@@ -92,8 +87,8 @@ export default function ExpandableModel() {
 
         } else {
             Animated.parallel([
-                animateItem(modalTranslateY, 400),
-                animateItem(modalOpacity, 1),
+                animateItem(modalTranslateY, MODAL_TRANFORMY_VALUE),
+                animateItem(modalOpacity, 0),
                 animateItem(itemWidth, elements.item.width, { easing: Easing.elastic(1.8), duration: 500 }),
                 Animated.sequence([
                     animateItem(itemHeight, elements.item.height + 5, { easing: Easing.elastic(1.8), }),
@@ -114,11 +109,10 @@ export default function ExpandableModel() {
         })
     }
 
+
+
     return (
-        <View className='bg-[#142525]  flex-1'>
-            <View className='py-4 px-2 bg-[#0e1616] '>
-                <DynamicText className='text-white' size={24}>Expandable Model</DynamicText>
-            </View>
+        <View className='bg-[#0b1012]  flex-1'>
             {/* Confirm Model Wrapper*/}
             <Animated.View
                 style={[
@@ -127,7 +121,7 @@ export default function ExpandableModel() {
                 ]}
                 className='absolute bottom-4 left-0'>
                 {/* Confirm Model */}
-                <View className='mx-4 gap-8 p-4 bg-[#0e1616] rounded-3xl'>
+                <View className='mx-4 gap-8 px-4 py-8  bg-[#0e1616] rounded-3xl'>
                     {/* Top Portion */}
                     <View className=''>
                         {/* Confirm Model Header */}
@@ -155,7 +149,7 @@ export default function ExpandableModel() {
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback>
                             <View ref={targetRef} style={{ opacity: 0 }} className='bg-[#8df0cc] flex-1 p-4 w-fit mx-auto rounded-full px-8 py-2 flex-row items-center justify-center'>
-                                <PoppinsText size={14} weight='regular'>Submit</PoppinsText>
+                                <PoppinsText size={14} weight='regular'>Yeah</PoppinsText>
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
@@ -186,9 +180,8 @@ export default function ExpandableModel() {
                                     { translateX: itemPageX },
                                     { translateY: itemPageY },
                                 ],
-                            } : undefined]}
-                        className='bg-[#8df0cc] p-4  rounded-full px-8 py-2 flex-row items-center justify-center'>
-                        <PoppinsText size={14} weight='regular'>Submit</PoppinsText>
+                            } : undefined, isModalOpen ? {} : styles.mainBtn]}>
+                        {isModalOpen ? <SwapperContent itemStyle={styles.mainBtn} /> : <PoppinsText size={14} weight='regular'>Open</PoppinsText>}
                     </Animated.View>
                 </TouchableWithoutFeedback>
             </View>
@@ -197,4 +190,40 @@ export default function ExpandableModel() {
             </View> */}
         </View>
     )
+}
+
+const styles = StyleSheet.create({
+    mainBtn: {
+        backgroundColor: "#8df0cc",
+        padding: 16,
+        borderRadius: 50,
+        paddingHorizontal: 32,
+        paddingVertical: 8,
+        alignItems: "center",
+        justifyContent: "center",
+    }
+})
+
+
+
+
+function SwapperContent({ itemStyle }: { itemStyle?: any }) {
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+
+    return <Animated.View style={[{
+        backgroundColor: fadeAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: ["#000", "#fff"]
+        }),
+    }, itemStyle, { width: "100%" }]}>
+        <PoppinsText size={14} weight='regular'>Yeah</PoppinsText>
+    </Animated.View>
 }

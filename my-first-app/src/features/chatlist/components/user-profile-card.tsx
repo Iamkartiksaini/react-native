@@ -46,4 +46,25 @@ const UserProfileCard = ({ ...props }: any) => {
     )
 }
 
+
+export function Avatar({ profilePic, title, avatarSize = 48 }: { profilePic?: string, title: string, avatarSize: number }) {
+    const st = useMemo(() => StyleSheet.create({
+        profilePic: {
+            height: moderateScale(avatarSize),
+            width: moderateScale(avatarSize),
+            borderRadius: moderateScale(avatarSize),
+            backgroundColor: "#fc6392",
+            justifyContent: "center",
+            alignItems: "center"
+        }
+    }), [avatarSize])
+    return (
+        profilePic ? <Image style={st.profilePic} source={{ uri: profilePic }} /> :
+            <View style={st.profilePic}>
+                <PoppinsText size={18} weight="semibold" className='text-white'>{title.slice(0, 1).toUpperCase()}</PoppinsText>
+            </View>
+    )
+}
+
+
 export default UserProfileCard
