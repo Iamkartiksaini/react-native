@@ -34,3 +34,4 @@ export  const messages: Message[] = [
     { id: 19, text: "You too!", sender: "user", media: null, time: "09:25 AM" },
     { id: 20, text: "Bye 👋", sender: "other", media: null, time: "09:26 AM" }
 ];
+export const messages_reversed = messages.reverse()
