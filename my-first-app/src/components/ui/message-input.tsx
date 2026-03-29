@@ -1,17 +1,26 @@
 import { useChatStore } from '@/store/chatStore'
 import { Mic, Paperclip, Send } from 'lucide-react-native'
 import React, { useState } from 'react'
-import { StyleSheet, TextInput, View } from 'react-native'
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { scale } from 'react-native-size-matters'
+import MessageMediaInput from './message-media-input'
 
 const ICON_SIZE = 22
 
 export default function MessageInput() {
     const { addMessage } = useChatStore()
     const [message, setMessage] = useState("")
+    const [mediaModalVisiblity, setMediaModalVisiblity] = useState(false);
 
     function handleChangeText(text: string) {
         setMessage(text)
+    }
+
+    function hideMediaModal() {
+        setMediaModalVisiblity(false)
+    }
+    function showMediaModal() {
+        setMediaModalVisiblity(true)
     }
 
     function handleSend() {
@@ -34,7 +43,9 @@ export default function MessageInput() {
     return (
         <View className='bg-pink-200' style={styles.container}>
             <View style={styles.iconContainer}>
-                <Paperclip size={ICON_SIZE} color={"#858E99"} />
+                <TouchableOpacity onPress={showMediaModal}>
+                    <Paperclip size={ICON_SIZE} color={"#858E99"} />
+                </TouchableOpacity>
             </View>
             <View className='flex-1 '>
                 <TextInput
@@ -55,6 +66,9 @@ export default function MessageInput() {
                     <Mic size={ICON_SIZE} color={"#858E99"} />
                 }
             </View>
+            <MessageMediaInput
+                visible={mediaModalVisiblity}
+                hideModal={hideMediaModal} />
         </View>
     )
 }

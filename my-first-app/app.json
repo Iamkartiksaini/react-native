@@ -59,7 +59,8 @@
             "./assets/fonts/bebas/BebasNeue-Regular.ttf"
           ]
         }
-      ]
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true

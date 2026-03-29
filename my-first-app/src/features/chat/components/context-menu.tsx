@@ -14,17 +14,6 @@ export default function MessageContextMenu() {
 
     const isUser = selectedMessage.sender === "user";
 
-    // Action items
-    const ActionItem = ({ icon: Icon, label, color = "#000", isLast = false }: any) => (
-        <Pressable
-            className={`flex-row items-center justify-between py-3 px-4 ${!isLast ? 'border-b border-gray-100' : ''}`}
-            onPress={clearSelectedMessage}
-        >
-            <PoppinsText size={16} style={{ color }}>{label}</PoppinsText>
-            <Icon size={20} color={color} />
-        </Pressable>
-    );
-
     const menuHeight = 260; // Approximate height of 5 items
     const spaceBelow = WINDOW_HEIGHT - (activeMessageLayout.pageY + activeMessageLayout.height);
     const showMenuAbove = spaceBelow < menuHeight + 20;
@@ -98,6 +87,20 @@ export default function MessageContextMenu() {
         </Modal>
     );
 }
+
+// Action items
+const ActionItem = ({ icon: Icon, label, color = "#000", isLast = false, clearSelectedMessage = () => { } }: any) => {
+
+    return (
+        <Pressable
+            className={`flex-row  active:bg-blue-50 items-center justify-between py-3 px-4 ${!isLast ? 'border-b border-gray-100' : ''}`}
+            onPress={clearSelectedMessage}
+        >
+            <PoppinsText size={14} style={{ color }}>{label}</PoppinsText>
+            <Icon size={20} color={color} />
+        </Pressable>
+    )
+};
 
 const styles = StyleSheet.create({
     overlay: {

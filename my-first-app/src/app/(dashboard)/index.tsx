@@ -13,6 +13,7 @@ export default function DashboardHome() {
         { id: 3, title: "Animated Tabs", Icon: MousePointer, link: "/animated-tabs" },
         { id: 4, title: "Expandable model", Icon: MousePointer, link: "/expandable-model" },
         { id: 5, title: "Test", Icon: MousePointer, link: "/test" },
+        { id: 5, title: "Video", Icon: MousePointer, link: "/video" },
         // { id: 6, title: "Shared Layout", Icon: MousePointer, link: "/shared-layout" },
     ]
 

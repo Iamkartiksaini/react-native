@@ -1,16 +1,10 @@
 import PoppinsText from "@/components/ui/poppins-text";
+import { Message } from "@/constants/message-const";
 import { useContextMenuStore } from "@/store/contextMenuStore";
 import { CheckCheck } from "lucide-react-native";
 import { useRef } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-
-interface Message {
-    id: number;
-    text: string;
-    sender: "user" | "other";
-    media: boolean | string | null;
-    time: string;
-}
+import MediaPreviewer from "./previewer/media";
 
 
 export default function MessageCard({ ...props }: Message) {
@@ -46,16 +40,17 @@ export default function MessageCard({ ...props }: Message) {
                 backgroundColor: "#f5f5f5"
             }]}
             onLongPress={handleLongPress}
-            delayLongPress={200}
+            delayLongPress={500}
         >
             <View
                 ref={viewRef}
                 style={[getMessageColor(), styles.content]}>
                 <View className="">
-                    <PoppinsText size={14}>{text}</PoppinsText>
+                    {media && <MediaPreviewer {...props} />}
+                    <PoppinsText size={14} className="text-neutral-600 mt-1">{text}</PoppinsText>
                 </View>
                 <View className="flex-row items-center gap-1"
-                    style={{ transform: [{ translateY: 8 }] }}
+                    style={{ transform: [{ translateY: 2 }] }}
                 >
                     <PoppinsText size={8}>{time}</PoppinsText>
                     <CheckCheck size={12} />
@@ -64,6 +59,8 @@ export default function MessageCard({ ...props }: Message) {
         </Pressable>
     )
 }
+
+
 
 const styles = StyleSheet.create({
     user: {
@@ -75,16 +72,16 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
     },
     container: {
-        padding: 10,
+        padding: 6,
         // borderRadius: 10,
     },
     content: {
         maxWidth: "85%",
         // flexDirection: "row",
         alignItems: "flex-end",
-        paddingHorizontal: 12,
-        paddingVertical: 12,
-        borderRadius: 12,
+        paddingHorizontal: 6,
+        paddingVertical: 6,
+        borderRadius: 8,
     },
     userMessageBG: {
         backgroundColor: "#00a5ef3b",
